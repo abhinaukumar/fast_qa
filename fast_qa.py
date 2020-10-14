@@ -104,7 +104,7 @@ def ms_ssim(img_ref, img_dist, k=11, max_val=1, K1=0.01, K2=0.03, full=False, pa
         x = (x[::2, ::2] + x[1::2, ::2] + x[1::2, 1::2] + x[::2, 1::2])/4
         y = (y[::2, ::2] + y[1::2, ::2] + y[1::2, 1::2] + y[::2, 1::2])/4
 
-    if np.min(X.shape) > k:
+    if np.min(x.shape) > k:
         scores[-1] = ssim(x, y, k, max_val, K1, K2, no_lum=False, padding=padding, stride=stride)
     msssim = np.prod(np.power(scores, weights))
     if full:
