@@ -94,16 +94,19 @@ def ms_ssim(img_ref, img_dist, k=11, max_val=1, K1=0.01, K2=0.03, full=False, pa
 
     n_levels = 5
     weights = np.array([0.0448, 0.2856, 0.3001, 0.2363, 0.1333])
-    scores = []
+    scores = np.ones((n_levels,))
     for i in range(n_levels-1):
-        scores.append(ssim(x, y, k, max_val, K1, K2, no_lum=True, padding=padding, stride=stride))
+        if np.min(x.shape) <= k:
+            break
+        scores[i] = ssim(x, y, k, max_val, K1, K2, no_lum=True, padding=padding, stride=stride)
         x = x[:(x.shape[0]//2)*2, :(x.shape[1]//2)*2]
         y = y[:(y.shape[0]//2)*2, :(y.shape[1]//2)*2]
         x = (x[::2, ::2] + x[1::2, ::2] + x[1::2, 1::2] + x[::2, 1::2])/4
         y = (y[::2, ::2] + y[1::2, ::2] + y[1::2, 1::2] + y[::2, 1::2])/4
 
-    scores.append(ssim(x, y, k, max_val, K1, K2, no_lum=False, padding=padding, stride=stride))
-    msssim = np.prod([np.power(e, p) for e,p in zip(scores, weights)])
+    if np.min(X.shape) > k:
+        scores[-1] = ssim(x, y, k, max_val, K1, K2, no_lum=False, padding=padding, stride=stride)
+    msssim = np.prod(np.power(scores, weights))
     if full:
         return msssim, scores
     else:
